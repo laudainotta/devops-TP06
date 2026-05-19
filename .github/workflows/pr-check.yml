@@ -1,0 +1,53 @@
+
+# ============================================
+# pr-check.yml — Checks rapidos en Pull Requests
+# ============================================
+name: PR Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+
+jobs:
+  validate:
+    name: Validar PR
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: 'pip'
+
+      - name: Instalar dependencias
+        run: pip install -r backend/requirements.txt
+
+
+      - name: Tests
+        run: cd backend && pytest tests/ -v
+
+      - name: Verificar docker-compose sintaxis
+        run: docker compose config --quiet
+
+      - name: Comentar resultado en el PR
+        if: always()
+        uses: actions/github-script@v7
+
+        env:
+          JOB_STATUS: ${{ job.status }}
+        with:
+          script: |
+            const status = process.env.JOB_STATUS === 'success' ? 'OK' : 'ERR';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${status} **PR Check** — ${process.env.JOB_STATUS}\nCommit: \`${context.sha}\``
+            });
+

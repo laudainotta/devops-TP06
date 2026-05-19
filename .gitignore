@@ -1,4 +1,34 @@
+
+# Secrets y credenciales
+.secrets
 .env
-*.log
+*.pem
+*.key
+
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+coverage.xml
+*.egg-info/
+venv/
+.venv/
+
+
+# Binarios y builds
+bin/
+build/
+dist/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

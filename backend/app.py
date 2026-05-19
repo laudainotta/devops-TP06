@@ -1,10 +1,13 @@
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import psycopg2, os, datetime
+import psycopg2
+import os
+import datetime
+
 
 app = Flask(__name__)
 CORS(app)
+
 
 def get_conn():
     return psycopg2.connect(
@@ -26,12 +29,10 @@ def init_db():
             content TEXT,
             created_at TIMESTAMP DEFAULT NOW()
         )
-
     """)
     conn.commit()
     cur.close()
     conn.close()
-
 
 
 @app.route("/health")
@@ -55,7 +56,8 @@ def get_notes():
     cur = conn.cursor()
     cur.execute("SELECT id, title, content, created_at FROM notes ORDER BY created_at DESC")
     rows = cur.fetchall()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return jsonify([
         {"id": r[0], "title": r[1], "content": r[2], "created_at": str(r[3])}
         for r in rows
@@ -64,7 +66,10 @@ def get_notes():
 
 @app.route("/api/notes", methods=["POST"])
 def create_note():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not data or not data.get("title"):
+        return jsonify({"error": "title is required"}), 400
+
     conn = get_conn()
     cur = conn.cursor()
     cur.execute(
@@ -73,7 +78,8 @@ def create_note():
     )
     note_id = cur.fetchone()[0]
     conn.commit()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return jsonify({"id": note_id, "message": "nota creada"}), 201
 
 
@@ -83,8 +89,10 @@ def delete_note(note_id):
     cur = conn.cursor()
     cur.execute("DELETE FROM notes WHERE id = %s", (note_id,))
     conn.commit()
-    cur.close(); conn.close()
+    cur.close()
+    conn.close()
     return jsonify({"message": "nota eliminada"})
+
 
 if __name__ == "__main__":
     init_db()
