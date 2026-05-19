@@ -47,10 +47,7 @@ jobs:
             --count --statistics
 
       - name: Lint YAML (yamllint)
-        run: |
-          yamllint -d "{extends: default, rules: {line-length: {max: 300}, document-start: disable, truthy: disable, empty-lines: disable, trailing-spaces: disable, new-line-at-end-of-file: disable, indentation: disable, comments: disable, comments-indentation: disable}}" \ 
-            docker-compose.yml \
-            .github/workflows/
+        run: yamllint docker-compose.yml .github/workflows/
 
 
   test:
