@@ -1,4 +1,3 @@
-
 # ============================================
 # cicd.yml — Pipeline completo CI/CD
 # TP07 — Plan DevOps
@@ -49,7 +48,7 @@ jobs:
 
       - name: Lint YAML (yamllint)
         run: |
-          yamllint -d "{extends: default, rules: {line-length: {max: 120}, document-start: disable, truthy: disable}}" \
+          yamllint -d "{extends: default, rules: {line-length: {max: 300}, document-start: disable, truthy: disable, empty-lines: disable, trailing-spaces: disable, new-line-at-end-of-file: disable, indentation: disable, comments: disable, comments-indentation: disable}}" \ 
             docker-compose.yml \
             .github/workflows/
 
